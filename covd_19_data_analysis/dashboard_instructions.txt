@@ -1,0 +1,9 @@
+To properly run your Streamlit application, you should use the streamlit run command instead of directly running the Python script.
+This will ensure that the Streamlit context is correctly set up.
+    
+Please follow these steps:    
+
+Open a terminal in Visual Studio Code.
+Run the following command:
+
+streamlit run dashboard.py

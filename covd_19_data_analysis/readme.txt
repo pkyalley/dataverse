@@ -1,0 +1,3 @@
+COVID-19 Data Analysis & Dashboard
+
+In this project, I analyzed a cleaned COVID-19 dataset using Python, focusing on confirmed cases, deaths, recoveries, and trends over time. Key tasks included data exploration, visualization, feature engineering, and predictive modeling. I also built an interactive dashboard using Streamlit to visualize trends and insights. The final dataset was exported as an Excel report for further analysis. 🚀
