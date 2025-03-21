@@ -1,0 +1,102 @@
+---
+title: "talco_customer_churn_analysis"
+author: "Prince Peter Yalley"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+
+install.packages(c("tidyverse", "DT", "corrplot"))
+install.packages("dplyr")
+install.packages("corrplot")
+
+library(tidyverse)  # For data wrangling and ggplot2
+library(DT)         # For interactive tables
+library(corrplot)   # For correlation plot
+library(dplyr)
+library(corrplot)
+
+
+```
+
+```{r cars}
+telco <- read.csv("WA_Fn-UseC_-Telco-Customer-Churn.csv", stringsAsFactors = TRUE)
+
+summary(telco)
+```
+
+```{r}
+# Load libraries
+library(tidyverse)  # This includes dplyr and ggplot2
+# or just: library(dplyr)
+
+# Load dataset
+telco <- read.csv("WA_Fn-UseC_-Telco-Customer-Churn.csv", stringsAsFactors = TRUE)
+
+# Convert TotalCharges to numeric
+telco$TotalCharges <- as.numeric(as.character(telco$TotalCharges))
+
+# Check missing values (NAs)
+colSums(is.na(telco))
+
+# Remove rows with missing TotalCharges
+telco <- telco %>% drop_na(TotalCharges)
+
+# Confirm cleaning
+summary(telco$TotalCharges)
+```
+```{r}
+ggplot(telco, aes(x = Churn, fill = Churn)) +
+  geom_bar() +
+  labs(title = "Churn Distribution", x = "Churn", y = "Count") +
+  theme_minimal()
+```
+```{r}
+ggplot(telco, aes(x = tenure, fill = Churn)) +
+  geom_histogram(binwidth = 5, position = "stack") +
+  labs(title = "Tenure Distribution by Churn", x = "Tenure (Months)", y = "Count") +
+  theme_minimal()
+```
+```{r}
+ggplot(telco, aes(x = MonthlyCharges, fill = Churn)) +
+  geom_histogram(binwidth = 5, position = "stack") +
+  labs(title = "Monthly Charges Distribution by Churn", x = "Monthly Charges ($)", y = "Count") +
+  theme_minimal()
+```
+```{r}
+ggplot(telco, aes(x = TotalCharges, fill = Churn)) +
+  geom_histogram(binwidth = 100, position = "stack") +
+  labs(title = "Total Charges Distribution by Churn", x = "Total Charges ($)", y = "Count") +
+  theme_minimal()
+```
+```{r}
+ggplot(telco, aes(x = PaymentMethod, fill = Churn)) +
+  geom_bar(position = "fill") +
+  labs(title = "Payment Method Distribution by Churn", x = "Payment Method", y = "Count") +
+  theme_minimal()
+```
+```{r}
+num_vars <- telco %>%
+  select(SeniorCitizen, tenure, MonthlyCharges, TotalCharges)
+
+# Correlation matrix
+corr_matrix <- cor(num_vars, use = "complete.obs")
+
+# Plot
+corrplot(corr_matrix, method = "circle", type = "upper")
+```
+
+
+
+```{r}
+
+```
+
+
+

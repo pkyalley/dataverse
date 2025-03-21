@@ -1,0 +1,148 @@
+---
+title: "Dashbaord_Shiny"
+author: "Prince Peter Yalley"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+# Load libraries
+library(shiny)
+library(ggplot2)
+library(dplyr)
+library(DT)
+library(corrplot)
+
+# Load data (file should be in the same folder as the app.R file)
+telco <- read.csv("WA_Fn-UseC_-Telco-Customer-Churn.csv", stringsAsFactors = TRUE)
+
+# Clean data
+telco$TotalCharges <- as.numeric(as.character(telco$TotalCharges))
+telco <- telco %>% drop_na(TotalCharges)
+
+# UI Layout
+ui <- fluidPage(
+  titlePanel("📊 Telco Customer Churn Dashboard"),
+
+  sidebarLayout(
+    sidebarPanel(
+      selectInput("internet", "Internet Service:",
+                  choices = levels(telco$InternetService)),
+      selectInput("gender", "Gender:",
+                  choices = c("All", levels(telco$gender))),
+      checkboxInput("senior", "Senior Citizens Only", value = FALSE),
+      downloadButton("downloadData", "Download Filtered Data")
+    ),
+
+    mainPanel(
+      fluidRow(
+        column(4, h4("Total Customers"), verbatimTextOutput("totalCustomers")),
+        column(4, h4("Churn Rate (%)"), verbatimTextOutput("churnRate")),
+        column(4, h4("Avg. Monthly Charges"), verbatimTextOutput("avgCharges"))
+      ),
+
+      tabsetPanel(
+        tabPanel("Churn Overview", plotOutput("churnPlot")),
+        tabPanel("Tenure by Churn", plotOutput("tenurePlot")),
+        tabPanel("Filtered Churn", plotOutput("filterPlot")),
+        tabPanel("Correlation", plotOutput("corrPlot")),
+        tabPanel("Data Table", DTOutput("dataTable"))
+      )
+    )
+  )
+)
+
+# Server Logic
+server <- function(input, output) {
+
+  # Reactive data based on filters
+  filtered_data <- reactive({
+    data <- telco %>% filter(InternetService == input$internet)
+
+    if (input$gender != "All") {
+      data <- data %>% filter(gender == input$gender)
+    }
+
+    if (input$senior) {
+      data <- data %>% filter(SeniorCitizen == 1)
+    }
+
+    return(data)
+  })
+
+  # KPIs
+  output$totalCustomers <- renderText({
+    nrow(filtered_data())
+  })
+
+  output$churnRate <- renderText({
+    churned <- sum(filtered_data()$Churn == "Yes")
+    total <- nrow(filtered_data())
+    rate <- ifelse(total > 0, round((churned / total) * 100, 2), 0)
+    paste(rate, "%")
+  })
+
+  output$avgCharges <- renderText({
+    avg <- mean(filtered_data()$MonthlyCharges, na.rm = TRUE)
+    paste("$", round(avg, 2))
+  })
+
+  # Plots
+  output$churnPlot <- renderPlot({
+    ggplot(filtered_data(), aes(x = Churn, fill = Churn)) +
+      geom_bar() +
+      labs(title = "Churn Distribution", x = "Churn", y = "Count") +
+      theme_minimal()
+  })
+
+  output$tenurePlot <- renderPlot({
+    ggplot(filtered_data(), aes(x = tenure, fill = Churn)) +
+      geom_histogram(binwidth = 5, position = "stack") +
+      labs(title = "Tenure Distribution by Churn", x = "Tenure (Months)", y = "Count") +
+      theme_minimal()
+  })
+
+  output$filterPlot <- renderPlot({
+    ggplot(filtered_data(), aes(x = Contract, fill = Churn)) +
+      geom_bar(position = "fill") +
+      labs(title = "Churn Rate by Contract Type", y = "Proportion") +
+      theme_minimal()
+  })
+
+  output$corrPlot <- renderPlot({
+    # Select numeric features for correlation
+    num_vars <- filtered_data() %>%
+      select(SeniorCitizen, tenure, MonthlyCharges, TotalCharges)
+
+    # Correlation matrix
+    corr_matrix <- cor(num_vars, use = "complete.obs")
+
+    # Correlation plot
+    corrplot(corr_matrix, method = "circle", type = "upper")
+  })
+
+  # DataTable
+  output$dataTable <- renderDT({
+    datatable(filtered_data(), options = list(pageLength = 10))
+  })
+
+  # Download handler
+  output$downloadData <- downloadHandler(
+    filename = function() {
+      paste("Filtered_Telco_Data", Sys.Date(), ".csv", sep = "")
+    },
+    content = function(file) {
+      write.csv(filtered_data(), file, row.names = FALSE)
+    }
+  )
+}
+
+# Run the app
+shinyApp(ui = ui, server = server)
+
+```
