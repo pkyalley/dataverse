@@ -1,23 +1,50 @@
+# Telco Customer Churn Analysis & Interactive Dashboard
 
-Telco Customer Churn Analysis
-This project analyzes Telco Customer Churn to provide actionable insights and predict churn likelihood.
+This project analyzes **Telco Customer Churn** data to explore, visualize, and predict customer churn. Through advanced data analysis, visualization, and machine learning, the goal is to provide actionable insights for improving customer retention.
 
-Features:
+## Key Features:
 
-EDA: Visualizing churn trends and key customer demographics.
-Machine Learning: Predicting churn using Logistic Regression and Random Forest.
-Dashboards: Interactive visualizations built with Streamlit (Python) and Shiny (R).
+- **Data Analysis**: Comprehensive **Exploratory Data Analysis (EDA)** to uncover key drivers of customer churn.
+- **Predictive Modeling**: Machine learning models to predict the likelihood of customer churn.
 
-Key Insights:
+## Interactive Dashboards:
+- Built with **Streamlit (Python)** for dynamic and quick visualizations.
+- Created **Shiny App (R)** for in-depth, interactive data exploration and statistical analysis.
 
-Month-to-month contracts have the highest churn.
-High monthly charges and short tenure increase churn risk.
-Improving tech support can reduce churn.
+## Tools & Libraries:
+- **Python**: 
+  - Pandas
+  - Scikit-learn
+  - Matplotlib
+  - Seaborn
+  - Streamlit
+- **RStudio**:
+  - Shiny
+  - ggplot2
+  - corrplot
+  - dplyr
 
-Why Python & R?
+## What’s Inside:
+1. **Data Preprocessing**: Cleaned and transformed the data for analysis.
+2. **EDA**: Visualized churn trends by customer characteristics (gender, contract type, etc.).
+3. **Machine Learning Models**: Logistic Regression, Random Forest for churn prediction.
+4. **Interactive Dashboards**: Real-time filtering options and visualizations.
+5. **Downloadable Reports**: Ability to download the filtered data as CSV.
 
-Python for machine learning and quick dashboards.
-RStudio & Shiny for advanced, interactive visualizations.
+## Business Insights & Recommendations:
+1. **Month-to-Month Contracts**: Customers with month-to-month contracts show higher churn, which suggests the need to incentivize long-term plans.
+2. **Target High-Risk Groups**: Customers with high monthly charges and short tenure are more likely to churn, suggesting opportunities for personalized retention offers.
+3. **Improve Support Services**: Lack of tech support and online services correlates with higher churn rates, emphasizing the need for better support infrastructure.
 
-To run the Streamlit Dashboard (Python):
-streamlit run app.py
+## Why Python & R?
+- **Python (VS Code)** was used for data processing, machine learning modeling, and creating a Streamlit dashboard due to its strong libraries and ease of integration with machine learning tools.
+- **RStudio & Shiny** were used for their superior visualization capabilities and customizable, interactive dashboard features, making them ideal for presenting business insights and detailed statistical analysis.
+
+## Running the Project:
+1. **Clone this repository**.
+2. Install necessary libraries:
+   - For Python: `pip install -r requirements.txt`
+   - For R: Install dependencies in RStudio
+3. **Run the Streamlit app**:
+   ```bash
+   streamlit run app.py
