@@ -42,7 +42,7 @@ facility_data <- data %>%
 # =========================
 ui <- fluidPage(
   
-  titlePanel("State Park Analytics Dashboard (EB-2 NIW Project)"),
+  titlePanel("State Park Analytics Dashboard"),
   
   sidebarLayout(
     sidebarPanel(
