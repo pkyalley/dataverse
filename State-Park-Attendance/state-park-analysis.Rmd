@@ -1,0 +1,228 @@
+---
+title: "State Park Attendance Analytics for Resource Optimization"
+author: "Prince Peter Yalley"
+date: "2025-01-27"
+output: html_document
+---
+
+1. Load Libraries
+```{r}
+library(tidyverse)
+library(lubridate)
+library(ggplot2)
+library(dplyr)
+library(readr)
+library(scales)
+library(forecast)
+library(caret)
+library(plotly)
+```
+
+2. Load Dataset
+```{r}
+data <- read_csv("State_Park_Annual_Attendance_Figures_by_Facility___Beginning_2003_20250211.csv")
+```
+
+3. View Data
+```{r}
+head(data)
+```
+
+4. Data Structure
+```{r}
+str(data)
+```
+5. Clean Column Names
+```{r}
+colnames(data) <- make.names(colnames(data))
+```
+
+6. Handle Missing Values
+```{r}
+data <- na.omit(data)
+```
+
+7. Summary Statistics
+```{r}
+summary(data)
+```
+
+8. Convert Year to Numeric
+```{r}
+data$Year <- as.numeric(data$Year)
+```
+
+9. Total Attendance by Year
+```{r}
+yearly_attendance <- data %>%
+  group_by(Year) %>%
+  summarise(Total = sum(Attendance))
+```
+
+10. Plot Attendance Trend
+```{r}
+ggplot(yearly_attendance, aes(x = Year, y = Total)) +
+  geom_line() +
+  geom_point() +
+  ggtitle("Annual Park Attendance Trend")
+```
+```{r}
+colnames(data) <- make.names(colnames(data))
+
+```
+
+```{r}
+colnames(data)
+```
+```{r}
+top_facilities <- data %>%
+  group_by(Facility) %>%
+  summarise(Total = sum(Attendance)) %>%
+  arrange(desc(Total)) %>%
+  head(10)
+```
+
+```{r}
+top_facilities <- data %>%
+  group_by(Facility) %>%
+  summarise(
+    Total_Attendance = sum(Attendance),
+    Avg_Attendance = mean(Attendance)
+  ) %>%
+  arrange(desc(Total_Attendance)) %>%
+  slice_head(n = 10)
+```
+
+```{r}
+ggplot(top_facilities, aes(x = reorder(Facility, Total_Attendance), y = Total_Attendance)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Top 10 State Park Facilities by Attendance",
+    x = "Facility",
+    y = "Total Attendance"
+  )
+```
+
+11. Top Facilities
+```{r}
+top_facilities <- data %>%
+  group_by(Facility) %>%
+  summarise(
+    Total = sum(Attendance),
+    Avg_Attendance = mean(Attendance)
+  ) %>%
+  arrange(desc(Total)) %>%
+  slice_head(n = 10)
+```
+
+12. Plot Top Facilities
+```{r}
+ggplot(top_facilities, aes(x = reorder(Facility, Total), y = Total)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Top 10 Facilities by Attendance",
+    x = "Facility",
+    y = "Total Attendance"
+  )
+```
+
+13. Year-over-Year Growth
+```{r}
+yearly_attendance <- data %>%
+  group_by(Year) %>%
+  summarise(Total = sum(Attendance)) %>%
+  arrange(Year)
+
+yearly_attendance <- yearly_attendance %>%
+  mutate(Growth = (Total - lag(Total)) / lag(Total))
+```
+
+14. Plot Growth
+```{r}
+ggplot(yearly_attendance, aes(x = Year, y = Growth)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Year-over-Year Growth Rate")
+```
+
+15. Time Series Conversion
+```{r}
+library(forecast)
+```
+
+```{r}
+ts_data <- ts(yearly_attendance$Total, start = min(yearly_attendance$Year))
+```
+
+
+```{r}
+model <- auto.arima(ts_data)
+forecasted <- forecast(model, h = 5)
+plot(forecasted)
+```
+
+18. Train-Test Split
+
+```{r}
+library(caret)
+```
+
+
+```{r}
+trainIndex <- createDataPartition(yearly_attendance$Total, p = 0.8, list = FALSE)
+
+train <- yearly_attendance[trainIndex, ]
+test <- yearly_attendance[-trainIndex, ]
+```
+
+19. Linear Regression Model
+```{r}
+lm_model <- lm(Total ~ Year, data = train)
+
+predictions <- predict(lm_model, newdata = test)
+
+RMSE(predictions, test$Total)
+```
+
+20. Predictions
+```{r}
+library(plotly)
+```
+
+21. Model Evaluation
+```{r}
+RMSE(predictions, test$Total)
+```
+
+22. Interactive Plot - Smooth Line
+```{r}
+p <- ggplot(yearly_attendance, aes(x = Year, y = Total)) + geom_line()
+ggplotly(p)
+```
+
+Interactive Plot - Smooth Line
+
+```{r}
+p <- ggplot(yearly_attendance, aes(x = Year, y = Total)) +
+  geom_line() +
+  geom_point()
+
+ggplotly(p)
+```
+
+23. Insights
+```{r}
+print("Attendance trends show long-term growth with fluctuations tied to external factors.")
+```
+
+24. Business Recommendation
+```{r}
+print("Invest in high-performing parks and optimize low-performing facilities using predictive insights.")
+```
+
+25. Export Results
+```{r}
+write.csv(yearly_attendance, "processed_attendance.csv", row.names = FALSE)
+```
