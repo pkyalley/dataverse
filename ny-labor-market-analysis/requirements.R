@@ -1,0 +1,19 @@
+install.packages(c(
+  "DT",
+  "dplyr",
+  "forecast",
+  "forcats",
+  "ggplot2",
+  "kableExtra",
+  "knitr",
+  "lubridate",
+  "plotly",
+  "readxl",
+  "rmarkdown",
+  "scales",
+  "shiny",
+  "shinydashboard",
+  "tidyr",
+  "tseries",
+  "zoo"
+))

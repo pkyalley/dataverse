@@ -20,14 +20,16 @@ Customer churn is one of the most costly challenges in the telecom industry. Thi
 ```
 telco-customer-churn-analysis/
 │
-├── WA_Fn-UseC_-Telco-Customer-Churn.csv   # Source dataset (IBM Sample Data)
-│
-├── telco_customer_churn_analysis_code.ipynb  # Python: EDA, modeling, visualizations
-├── dashboard_python.py                        # Streamlit interactive dashboard
-│
-├── telco_customer_churn_analysis_rstudio.Rmd # R: full analysis in R Markdown
-├── dashboard_shiny_app.Rmd                    # R Shiny dashboard application
-│
+├── app.py                                   # Streamlit interactive dashboard
+├── telco_customer_churn_analysis_code.ipynb # Python: EDA, modeling, visualizations
+├── data/
+│   └── raw/
+│       └── WA_Fn-UseC_-Telco-Customer-Churn.csv
+├── reports/
+│   ├── telco_customer_churn_analysis_rstudio.Rmd # R: full analysis report
+│   └── dashboard_shiny_app.Rmd                    # R Shiny dashboard
+├── requirements.txt
+├── requirements.R
 └── README.md
 ```
 
@@ -70,7 +72,7 @@ telco-customer-churn-analysis/
 Install dependencies:
 
 ```bash
-pip install pandas numpy matplotlib seaborn scikit-learn streamlit
+pip install -r requirements.txt
 ```
 
 Run the Jupyter Notebook for the full analysis:
@@ -82,7 +84,7 @@ jupyter notebook telco_customer_churn_analysis_code.ipynb
 Launch the Streamlit dashboard:
 
 ```bash
-streamlit run dashboard_python.py
+streamlit run app.py
 ```
 
 ### R (R Markdown Report + Shiny Dashboard)
@@ -90,15 +92,20 @@ streamlit run dashboard_python.py
 Install R (≥ 4.2) and RStudio, then install required packages:
 
 ```r
-install.packages(c(
-  "shiny", "rmarkdown", "ggplot2", "dplyr",
-  "corrplot", "scales", "DT"
-))
+source("requirements.R")
 ```
 
-Render the R Markdown report in RStudio by opening `telco_customer_churn_analysis_rstudio.Rmd` and clicking **Knit**.
+Render the R Markdown report:
 
-Launch the Shiny dashboard by opening `dashboard_shiny_app.Rmd` and clicking **Run Document**.
+```r
+rmarkdown::render("reports/telco_customer_churn_analysis_rstudio.Rmd")
+```
+
+Launch the Shiny dashboard:
+
+```r
+rmarkdown::run("reports/dashboard_shiny_app.Rmd")
+```
 
 ---
 

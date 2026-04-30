@@ -18,7 +18,12 @@ The workflow is simple, reproducible, and easily adaptable to other commodities,
 gold-usd-price-tracker/
 │
 ├── fetch_gold_usd_prices_from_yf.py   # Python script to fetch and save data
-├── Gold_USD_Prices_from_yf.xlsx        # Output Excel file (Jan 2023 – Dec 2024)
+├── data/
+│   ├── processed/
+│   │   └── Gold_USD_Prices_from_yf.xlsx  # Output Excel file (Jan 2023 – Dec 2024)
+│   └── raw/
+│       └── .gitkeep
+├── requirements.txt
 └── README.md
 ```
 
@@ -53,7 +58,7 @@ gold-usd-price-tracker/
 Install the required Python libraries:
 
 ```bash
-pip install yfinance pandas openpyxl
+pip install -r requirements.txt
 ```
 
 ### Run the script
@@ -62,7 +67,7 @@ pip install yfinance pandas openpyxl
 python fetch_gold_usd_prices_from_yf.py
 ```
 
-This will fetch the data and save it as `Gold_USD_Prices.xlsx` in the current directory.
+This will fetch the data and save it as `data/processed/Gold_USD_Prices_from_yf.xlsx`.
 
 ---
 
@@ -73,7 +78,7 @@ To change the date range or asset, edit these lines in the script:
 ```python
 stock_symbol = "GC=F"       # Yahoo Finance ticker (e.g. "GC=F" for Gold, "SI=F" for Silver)
 start_date = "2023-01-01"   # Start date (YYYY-MM-DD)
-end_date   = "2023-12-31"   # End date   (YYYY-MM-DD)
+end_date   = "2024-12-31"   # End date   (YYYY-MM-DD)
 ```
 
 ---
@@ -95,4 +100,3 @@ end_date   = "2023-12-31"   # End date   (YYYY-MM-DD)
 Data collection, automation, and financial data analysis.
 
 [![GitHub](https://img.shields.io/badge/GitHub-pkyalley-181717?style=flat&logo=github)](https://github.com/pkyalley)
-

@@ -1,0 +1,16 @@
+install.packages(c(
+  "bslib",
+  "caret",
+  "DT",
+  "forecast",
+  "leaflet",
+  "lubridate",
+  "plotly",
+  "randomForest",
+  "readr",
+  "rmarkdown",
+  "scales",
+  "shiny",
+  "shinycssloaders",
+  "tidyverse"
+))

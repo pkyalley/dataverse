@@ -20,13 +20,16 @@ The project delivers two polished data products:
 ```
 ny-state-park-attendance-analysis/
 │
-├── State_Park_Annual_Attendance_Figures_by_Facility_...csv  # Raw source data
-├── processed_attendance.csv                                  # Cleaned dataset
-│
-├── state-park-analysis.Rmd    # R Markdown source for the static report
-├── state-park-analysis.html   # Rendered HTML report
-├── state-park-shiny.R         # Interactive Shiny dashboard
-│
+├── app.R                                             # Interactive Shiny dashboard
+├── data/
+│   ├── raw/
+│   │   └── State_Park_Annual_Attendance_Figures_by_Facility___Beginning_2003_20250211.csv
+│   └── processed/
+│       └── processed_attendance.csv                  # Cleaned dataset snapshot
+├── reports/
+│   ├── state-park-analysis.Rmd                        # R Markdown source
+│   └── state-park-analysis.html                       # Rendered HTML report snapshot
+├── requirements.R
 └── README.md
 ```
 
@@ -58,24 +61,21 @@ ny-state-park-attendance-analysis/
 Install R (≥ 4.2) and RStudio, then install required packages:
 
 ```r
-install.packages(c(
-  "shiny", "tidyverse", "plotly", "forecast", "DT",
-  "leaflet", "randomForest", "rmarkdown", "bslib", "shinycssloaders"
-))
+source("requirements.R")
 ```
 
 ### 1. Run the HTML Report
 
-Open `state-park-analysis.Rmd` in RStudio and click **Knit**, or run:
+Open `reports/state-park-analysis.Rmd` in RStudio and click **Knit**, or run:
 
 ```r
-rmarkdown::render("state-park-analysis.Rmd", output_file = "state-park-analysis.html")
+rmarkdown::render("reports/state-park-analysis.Rmd")
 ```
 
 ### 2. Launch the Shiny Dashboard
 
 ```r
-shiny::runApp("state-park-shiny.R")
+shiny::runApp("app.R")
 ```
 
 ---

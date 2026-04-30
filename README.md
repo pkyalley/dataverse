@@ -17,6 +17,15 @@
 
 ---
 
+## 📌 Repository Conventions
+
+- **Data layout:** each project uses `data/raw/` for source data and `data/processed/` for derived outputs.
+- **Reports:** R Markdown reports live in `reports/` and render HTML snapshots committed to the repo.
+- **Entrypoints:** apps use `app.R` (Shiny) or `app.py` (Streamlit) at the project root.
+- **Dependencies:** Python projects include `requirements.txt`; R projects include `requirements.R`.
+
+---
+
 ## 🔧 Tech Stack
 
 This repository uses a mix of tools depending on the project:

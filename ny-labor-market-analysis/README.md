@@ -25,15 +25,17 @@ This project takes monthly labor market data and turns it into two polished, int
 ## 📁 Project Structure
 
 ```
-NY-Labor-Market-Unemployment-Analysis/
+ny-labor-market-analysis/
 │
-├── data/
-│   └── Employment__Unemployment__and_Labor_Force_Data.xlsx
-│
-├── labor_market_analysis.Rmd     # Narrative HTML report (R Markdown)
-├── report_style.css              # Custom CSS styling for the report
 ├── app.R                         # Shiny dashboard application
-│
+├── data/
+│   └── raw/
+│       └── Employment__Unemployment__and_Labor_Force_Data.xlsx
+├── reports/
+│   ├── labor_market_analysis.Rmd     # Narrative HTML report (R Markdown)
+│   ├── labor_market_analysis.html    # Rendered HTML report snapshot
+│   └── report_style.css              # Custom CSS styling for the report
+├── requirements.R
 └── README.md
 ```
 
@@ -80,27 +82,22 @@ NY-Labor-Market-Unemployment-Analysis/
 Install R (≥ 4.2) and RStudio, then install the required packages:
 
 ```r
-install.packages(c(
-  "readxl", "dplyr", "tidyr", "ggplot2", "scales",
-  "lubridate", "knitr", "kableExtra", "rmarkdown",
-  "zoo", "forecast", "tseries",
-  "shiny", "shinydashboard", "plotly", "DT", "forcats"
-))
+source("requirements.R")
 ```
 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/pkyalley/NY-Labor-Market-Unemployment-Analysis.git
-cd NY-Labor-Market-Unemployment-Analysis
+git clone https://github.com/pkyalley/dataverse.git
+cd dataverse/ny-labor-market-analysis
 ```
 
 ### 2. Run the HTML Report
 
-Open `labor_market_analysis.Rmd` in RStudio and click **Knit**, or run:
+Open `reports/labor_market_analysis.Rmd` in RStudio and click **Knit**, or run:
 
 ```r
-rmarkdown::render("labor_market_analysis.Rmd", output_file = "Labor_Market_Report.html")
+rmarkdown::render("reports/labor_market_analysis.Rmd")
 ```
 
 ### 3. Launch the Shiny Dashboard
@@ -111,7 +108,7 @@ Open `app.R` in RStudio and click **Run App**, or run:
 shiny::runApp(".")
 ```
 
-> **Note:** Both the report and the app expect the Excel file to be inside a `data/` subfolder in your working directory.
+> **Note:** Both the report and the app expect the Excel file to be inside `data/raw/` relative to the project root.
 
 ---
 

@@ -10,12 +10,12 @@ import pandas as pd
 stock_symbol = "GC=F"
 
 start_date = "2023-01-01"
-end_date = "2023-12-31"
+end_date = "2024-12-31"
 
 stock_data = yf.download(stock_symbol, start_date, end_date)
 
 selected_data = stock_data[["Open", "High", "Low", "Close"]]
 
-selected_data.to_excel("Gold_USD_Prices.xlsx", index = True)
+selected_data.to_excel("data/processed/Gold_USD_Prices_from_yf.xlsx", index = True)
 
-print("Data collected and saved as Gold_USD_Prices.xlsx")
+print("Data collected and saved as data/processed/Gold_USD_Prices_from_yf.xlsx")

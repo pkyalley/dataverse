@@ -1,0 +1,390 @@
+---
+title: "New York State Licensed Guides"
+subtitle: "An Analysis of Outdoor Recreation Leadership Across the Empire State"
+author: "Prince Peter Yalley"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+  html_document:
+    theme: flatly
+    highlight: tango
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+    toc_depth: 3
+    number_sections: false
+    code_folding: hide
+    css: report_style.css
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 10,
+  fig.height = 6,
+  fig.align = "center",
+  out.width = "100%"
+)
+```
+
+```{r libraries}
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(scales)
+library(knitr)
+library(kableExtra)
+library(lubridate)
+library(stringr)
+library(forcats)
+```
+
+---
+
+# About This Dataset
+
+New York State requires professional guides to obtain a license through the Department of Environmental Conservation (DEC). These individuals lead clients through the state's vast natural landscapes — from the Adirondack High Peaks to the whitewater rivers of the Catskills — for activities including hiking, fishing, hunting, camping, and technical climbing.
+
+This dataset, published by NY Open Data and last updated **January 27, 2025**, captures a snapshot of all **currently licensed guides** in the state. It contains `r nrow(read_csv("../data/raw/Guides_Currently_Licensed_in_New_York_State_20250127.csv"))` license records — but because guides can hold multiple activity certifications, the actual number of individual guides is smaller.
+
+**Key questions this analysis explores:**
+
+- Where are guides concentrated geographically in New York?
+- What outdoor activities are most represented?
+- How does license expiration timing break down?
+- What share of licensed guides come from outside New York State?
+
+---
+
+```{r load-data}
+raw_data <- read_csv("../data/raw/Guides_Currently_Licensed_in_New_York_State_20250127.csv",
+                     show_col_types = FALSE)
+
+# Clean data
+guides <- raw_data %>%
+  filter(!is.na(County), str_trim(County) != "") %>%
+  mutate(
+    County = str_to_title(str_trim(County)),
+    City   = str_to_title(str_trim(City)),
+    `Activity Type Description` = str_trim(`Activity Type Description`),
+    Expiration_Date = mdy(`Expiration Date`),
+    Exp_Year = year(Expiration_Date),
+    NY_Resident = ifelse(State == "NY", "New York", "Out of State")
+  )
+```
+
+# Overview: The Numbers at a Glance
+
+```{r summary-stats}
+n_records   <- nrow(guides)
+n_guides    <- n_distinct(guides$`Badge Number`)
+n_counties  <- n_distinct(guides$County)
+n_activities <- n_distinct(guides$`Activity Type Description`)
+n_outofstate <- sum(guides$State != "NY")
+pct_outofstate <- round(100 * n_outofstate / n_records, 1)
+```
+
+<div class="stat-grid">
+<div class="stat-card">
+  <div class="stat-num">`r format(n_records, big.mark=",")`</div>
+  <div class="stat-label">Total License Records</div>
+</div>
+<div class="stat-card">
+  <div class="stat-num">`r format(n_guides, big.mark=",")`</div>
+  <div class="stat-label">Individual Guides</div>
+</div>
+<div class="stat-card">
+  <div class="stat-num">`r n_counties`</div>
+  <div class="stat-label">Counties Represented</div>
+</div>
+<div class="stat-card">
+  <div class="stat-num">`r n_activities`</div>
+  <div class="stat-label">Activity Types</div>
+</div>
+<div class="stat-card">
+  <div class="stat-num">`r pct_outofstate`%</div>
+  <div class="stat-label">Out-of-State Guides</div>
+</div>
+</div>
+
+---
+
+# Geographic Distribution
+
+## Top 15 Counties by Number of Licensed Guides
+
+New York's outdoor guiding industry is heavily concentrated in the **Adirondack region** — a 6-million-acre park in the northeastern part of the state. Essex, Warren, and Franklin counties — all Adirondack counties — dominate the rankings. The Catskills (Ulster) and the Finger Lakes / Great Lakes corridor also show strong representation.
+
+```{r county-chart, fig.height=7}
+county_summary <- guides %>%
+  group_by(County) %>%
+  summarise(Num_Licenses = n(), .groups = "drop") %>%
+  arrange(desc(Num_Licenses)) %>%
+  slice_head(n = 15)
+
+ggplot(county_summary, aes(x = fct_reorder(County, Num_Licenses), y = Num_Licenses)) +
+  geom_col(fill = "#2c7bb6", width = 0.72) +
+  geom_text(aes(label = Num_Licenses), hjust = -0.15, size = 3.4, color = "#333333") +
+  coord_flip(clip = "off") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.12))) +
+  labs(
+    title = "Top 15 New York Counties by Licensed Guide Count",
+    subtitle = "Adirondack counties dominate — Essex alone accounts for 6.5% of all records",
+    x = NULL,
+    y = "Number of License Records",
+    caption = "Source: NY Open Data | January 2025"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title    = element_text(face = "bold", size = 15),
+    plot.subtitle = element_text(color = "#555555", size = 11),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor   = element_blank(),
+    plot.caption  = element_text(color = "#999999", size = 9),
+    axis.text.y   = element_text(size = 11)
+  )
+```
+
+## County-Level Data Table
+
+```{r county-table}
+guides %>%
+  group_by(County) %>%
+  summarise(
+    `License Records` = n(),
+    `Unique Guides`   = n_distinct(`Badge Number`),
+    `Avg Licenses/Guide` = round(n() / n_distinct(`Badge Number`), 1)
+  ) %>%
+  arrange(desc(`License Records`)) %>%
+  head(20) %>%
+  kable(caption = "Top 20 Counties — License records, unique guides, and certification depth") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE, position = "left") %>%
+  row_spec(0, bold = TRUE, background = "#2c7bb6", color = "white")
+```
+
+---
+
+# Activity Types
+
+## What Are Licensed Guides Certified For?
+
+```{r activity-chart, fig.height=6}
+activity_summary <- guides %>%
+  group_by(`Activity Type Description`) %>%
+  summarise(Count = n(), .groups = "drop") %>%
+  arrange(desc(Count))
+
+activity_colors <- c(
+  "Boats and Canoes" = "#1a7abf",
+  "Fishing"          = "#2eaa62",
+  "Hiking"           = "#e87722",
+  "Camping"          = "#9b59b6",
+  "Hunting"          = "#c0392b",
+  "WW Rafting"       = "#16a085",
+  "Tier I Rock"      = "#8e8e8e",
+  "Tier I Ice"       = "#5dade2",
+  "Tier II Rock"     = "#626567",
+  "Tier II Ice"      = "#85c1e9",
+  "WW Kayaking"      = "#48c9b0",
+  "WW Canoeing"      = "#58d68d"
+)
+
+ggplot(activity_summary,
+       aes(x = fct_reorder(`Activity Type Description`, Count),
+           y = Count,
+           fill = `Activity Type Description`)) +
+  geom_col(width = 0.72, show.legend = FALSE) +
+  geom_text(aes(label = Count), hjust = -0.15, size = 3.5) +
+  coord_flip(clip = "off") +
+  scale_fill_manual(values = activity_colors) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.12))) +
+  labs(
+    title    = "Number of License Records by Activity Type",
+    subtitle = "Boats & Canoes, Fishing, and Hiking account for nearly two-thirds of all certifications",
+    x = NULL,
+    y = "Number of License Records",
+    caption = "Source: NY Open Data | January 2025"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title    = element_text(face = "bold", size = 15),
+    plot.subtitle = element_text(color = "#555555", size = 11),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor   = element_blank(),
+    plot.caption  = element_text(color = "#999999", size = 9),
+    axis.text.y   = element_text(size = 11)
+  )
+```
+
+## Activity Breakdown by Top Counties
+
+This heatmap shows how activity preferences vary across the 10 most guide-rich counties. Counties like **Essex** (Adirondacks) have a diverse spread, while others specialize heavily in water or fishing activities.
+
+```{r heatmap, fig.height=6}
+top10_counties <- county_summary$County[1:10]
+
+heatmap_data <- guides %>%
+  filter(County %in% top10_counties) %>%
+  group_by(County, `Activity Type Description`) %>%
+  summarise(Count = n(), .groups = "drop") %>%
+  group_by(County) %>%
+  mutate(Pct = Count / sum(Count) * 100)
+
+ggplot(heatmap_data,
+       aes(x = `Activity Type Description`,
+           y = fct_reorder(County, -Count, sum),
+           fill = Pct)) +
+  geom_tile(color = "white", linewidth = 0.5) +
+  geom_text(aes(label = ifelse(Pct >= 5, paste0(round(Pct), "%"), "")),
+            size = 3, color = "white") +
+  scale_fill_gradient(low = "#d6eaf8", high = "#1a5276",
+                      name = "% of County\nCertifications") +
+  labs(
+    title    = "Activity Mix Across Top 10 Counties (% of county's certifications)",
+    subtitle = "Darker = higher share. Adirondack counties show diverse activity profiles.",
+    x = NULL, y = NULL,
+    caption = "Source: NY Open Data | January 2025"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title    = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(color = "#555555", size = 10),
+    axis.text.x   = element_text(angle = 35, hjust = 1, size = 10),
+    axis.text.y   = element_text(size = 11),
+    legend.position = "right",
+    plot.caption  = element_text(color = "#999999", size = 9)
+  )
+```
+
+---
+
+# License Expiration Timeline
+
+## When Do Current Licenses Expire?
+
+Understanding the expiration wave is important for workforce planning. NY guide licenses appear to be issued on a rolling multi-year basis. The chart below shows how many license records expire in each upcoming year.
+
+```{r expiration-chart}
+exp_summary <- guides %>%
+  filter(!is.na(Exp_Year)) %>%
+  group_by(Exp_Year) %>%
+  summarise(Count = n(), .groups = "drop")
+
+ggplot(exp_summary, aes(x = factor(Exp_Year), y = Count)) +
+  geom_col(fill = "#e67e22", width = 0.65) +
+  geom_text(aes(label = format(Count, big.mark = ",")), vjust = -0.4, size = 3.6) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.12)),
+                     labels = comma) +
+  labs(
+    title    = "License Records by Expiration Year",
+    subtitle = "2028–2029 represent the largest renewal wave; ~13% expire in 2025",
+    x = "Expiration Year",
+    y = "Number of License Records",
+    caption = "Source: NY Open Data | January 2025"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title    = element_text(face = "bold", size = 15),
+    plot.subtitle = element_text(color = "#555555", size = 11),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor   = element_blank(),
+    plot.caption  = element_text(color = "#999999", size = 9)
+  )
+```
+
+---
+
+# Where Do Guides Come From?
+
+## New York Residents vs. Out-of-State Guides
+
+A significant share of licensed guides — roughly **`r pct_outofstate`%** — reside outside New York State. This reflects the regional nature of outdoor guiding: guides from neighboring states like Pennsylvania, New Jersey, Vermont, and Connecticut frequently work in NY's border wilderness areas.
+
+```{r residency-chart, fig.height=5}
+state_counts <- guides %>%
+  count(State, sort = TRUE) %>%
+  filter(State != "NY") %>%
+  slice_head(n = 10) %>%
+  mutate(State = fct_reorder(State, n))
+
+ggplot(state_counts, aes(x = State, y = n)) +
+  geom_col(fill = "#27ae60", width = 0.68) +
+  geom_text(aes(label = n), hjust = -0.15, size = 3.5) +
+  coord_flip(clip = "off") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
+  labs(
+    title    = "Top 10 Out-of-State Home States for NY-Licensed Guides",
+    subtitle = "Pennsylvania and New Jersey neighbors contribute the most out-of-state guides",
+    x = NULL, y = "Number of License Records",
+    caption = "Source: NY Open Data | January 2025"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title    = element_text(face = "bold", size = 15),
+    plot.subtitle = element_text(color = "#555555", size = 11),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor   = element_blank(),
+    plot.caption  = element_text(color = "#999999", size = 9)
+  )
+```
+
+---
+
+# Multi-Certification Guides
+
+## How Diverse Are Guides' Certifications?
+
+Many licensed guides hold certifications in more than one activity — a sign of professional versatility. The chart below shows how certifications are distributed among individual guides (by badge number).
+
+```{r multi-cert}
+badge_certs <- guides %>%
+  group_by(`Badge Number`) %>%
+  summarise(Num_Certs = n(), .groups = "drop") %>%
+  count(Num_Certs, name = "Num_Guides")
+
+ggplot(badge_certs, aes(x = factor(Num_Certs), y = Num_Guides)) +
+  geom_col(fill = "#8e44ad", width = 0.65) +
+  geom_text(aes(label = Num_Guides), vjust = -0.4, size = 3.6) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
+  labs(
+    title    = "Distribution of Certifications per Individual Guide",
+    subtitle = "Over 1,900 guides hold 2+ certifications — a marker of professional breadth",
+    x = "Number of Activity Certifications",
+    y = "Number of Guides",
+    caption = "Source: NY Open Data | January 2025"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title    = element_text(face = "bold", size = 15),
+    plot.subtitle = element_text(color = "#555555", size = 11),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor   = element_blank(),
+    plot.caption  = element_text(color = "#999999", size = 9)
+  )
+```
+
+---
+
+# Key Takeaways
+
+<div class="takeaway-box">
+
+1. **The Adirondacks are the beating heart of NY guiding.** Essex, Warren, and Franklin counties alone represent over 16% of all license records — a direct reflection of the Adirondack Park's dominance in outdoor recreation.
+
+2. **Water activities lead the way.** Boats & Canoes and Fishing together account for nearly half of all certifications, underscoring New York's exceptional waterway and lake systems.
+
+3. **A regional workforce, not just a local one.** Nearly 1 in 6 licensed guides lives outside New York, with strong representation from PA, NJ, VT, and CT — states that share wilderness borders with NY.
+
+4. **A big renewal wave is coming.** Over 2,900 license records (nearly half) expire in 2028–2029. The NY DEC should anticipate a major renewal processing period in those years.
+
+5. **Professional guides are versatile.** The majority of individual guides (by badge number) hold certifications in 2 or more activity types, reflecting a serious, multi-disciplinary outdoor profession.
+
+</div>
+
+---
+
+*Data sourced from [NY Open Data](https://data.ny.gov/). Analysis conducted in R using `readr`, `dplyr`, `ggplot2`, `lubridate`, and `kableExtra`.*

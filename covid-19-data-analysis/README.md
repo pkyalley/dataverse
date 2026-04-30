@@ -20,10 +20,15 @@ Key questions this project answers:
 ```
 covid-19-data-analysis/
 │
-├── covid_19_clean_complete.csv       # Cleaned COVID-19 dataset
+├── app.py                            # Streamlit interactive dashboard
 ├── covid_19_clean_complete.ipynb     # Jupyter Notebook — full analysis
-├── dashboard.py                      # Streamlit interactive dashboard
+├── data/
+│   ├── processed/
+│   │   └── covid_19_clean_complete.csv
+│   └── raw/
+│       └── .gitkeep
 ├── dashboard_instructions.txt        # Instructions for running the dashboard
+├── requirements.txt
 └── README.md
 ```
 
@@ -31,7 +36,7 @@ covid-19-data-analysis/
 
 ## 📊 The Data
 
-**Dataset:** `covid_19_clean_complete.csv` — a pre-cleaned version of the Johns Hopkins COVID-19 dataset.
+**Dataset:** `data/processed/covid_19_clean_complete.csv` — a pre-cleaned version of the Johns Hopkins COVID-19 dataset.
 
 **Key columns:**
 
@@ -64,7 +69,7 @@ covid-19-data-analysis/
 Install the required Python libraries:
 
 ```bash
-pip install pandas numpy matplotlib seaborn streamlit openpyxl
+pip install -r requirements.txt
 ```
 
 ### 1. Run the Jupyter Notebook
@@ -80,7 +85,7 @@ jupyter notebook covid_19_clean_complete.ipynb
 Open a terminal, navigate to this folder, and run:
 
 ```bash
-streamlit run dashboard.py
+streamlit run app.py
 ```
 
 The dashboard will open automatically in your browser at `http://localhost:8501`.
