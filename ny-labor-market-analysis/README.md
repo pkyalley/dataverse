@@ -25,7 +25,7 @@ This project takes monthly labor market data and turns it into two polished, int
 ## 📁 Project Structure
 
 ```
-labour-market-analysis/
+ny-labor-market-analysis/
 │
 ├── app.R                         # Shiny dashboard application
 ├── data/
@@ -88,8 +88,8 @@ source("requirements.R")
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/pkyalley/NY-Labor-Market-Unemployment-Analysis.git
-cd NY-Labor-Market-Unemployment-Analysis
+git clone https://github.com/pkyalley/dataverse.git
+cd dataverse/ny-labor-market-analysis
 ```
 
 ### 2. Run the HTML Report

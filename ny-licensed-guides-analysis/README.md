@@ -26,7 +26,7 @@ The goal is to answer meaningful questions about the state of outdoor guiding in
 ## 📁 Project Structure
 
 ```
-Who-Guides-New-York/
+ny-licensed-guides-analysis/
 │
 ├── app.R                    # Shiny dashboard application
 ├── data/
@@ -104,8 +104,8 @@ source("requirements.R")
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/ny-guides-project.git
-cd ny-guides-project
+git clone https://github.com/pkyalley/dataverse.git
+cd dataverse/ny-licensed-guides-analysis
 ```
 
 ### 2. Run the HTML Report
