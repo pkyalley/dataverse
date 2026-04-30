@@ -6,13 +6,14 @@ Exploring New York State Park visitor trends (2003–2024) through interactive d
 
 ## What's in this repo
 
-| File | Description |
+| Path | Description |
 |------|-------------|
-| `state-park-analysis.Rmd` | R Markdown source for the static report |
-| `state-park-analysis.html` | Rendered HTML report |
 | `app.R` | Interactive Shiny dashboard |
-| `processed_attendance.csv` | Cleaned dataset |
-| `State_Park_Annual_Attendance_Figures_by_Facility_...csv` | Raw source data |
+| `reports/state-park-analysis.Rmd` | R Markdown source for the static report |
+| `reports/state-park-analysis.html` | Rendered HTML report snapshot |
+| `data/raw/State_Park_Annual_Attendance_Figures_by_Facility___Beginning_2003_20250211.csv` | Raw source data |
+| `data/processed/processed_attendance.csv` | Cleaned dataset snapshot |
+| `requirements.R` | R package install list |
 
 ---
 
@@ -37,13 +38,13 @@ Exploring New York State Park visitor trends (2003–2024) through interactive d
 
 ```r
 # Install dependencies
-install.packages(c(
-  "shiny", "tidyverse", "plotly", "forecast", "DT",
-  "leaflet", "randomForest", "rmarkdown", "bslib", "shinycssloaders"
-))
+source("requirements.R")
 
 # Run the dashboard
 shiny::runApp("app.R")
+
+# Render the report
+rmarkdown::render("reports/state-park-analysis.Rmd")
 ```
 
 ---

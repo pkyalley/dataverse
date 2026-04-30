@@ -12,7 +12,7 @@ This project analyzes **Telco Customer Churn** data to explore, visualize, and p
 - Created **Shiny App (R)** for in-depth, interactive data exploration and statistical analysis.
 
 ## Tools & Libraries:
-- **Python**: 
+- **Python**:
   - Pandas
   - Scikit-learn
   - Matplotlib
@@ -40,11 +40,24 @@ This project analyzes **Telco Customer Churn** data to explore, visualize, and p
 - **Python (VS Code)** was used for data processing, machine learning modeling, and creating a Streamlit dashboard due to its strong libraries and ease of integration with machine learning tools.
 - **RStudio & Shiny** were used for their superior visualization capabilities and customizable, interactive dashboard features, making them ideal for presenting business insights and detailed statistical analysis.
 
+## Project Layout
+
+- `app.py` — Streamlit dashboard
+- `reports/` — R Markdown analyses (including the Shiny Rmd)
+- `data/raw/WA_Fn-UseC_-Telco-Customer-Churn.csv` — source dataset
+- `requirements.txt` / `requirements.R` — dependency lists
+
 ## Running the Project:
 1. **Clone this repository**.
 2. Install necessary libraries:
    - For Python: `pip install -r requirements.txt`
-   - For R: Install dependencies in RStudio
+   - For R: `source("requirements.R")`
 3. **Run the Streamlit app**:
    ```bash
    streamlit run app.py
+   ```
+4. **Render or run the R Markdown analyses**:
+   ```r
+   rmarkdown::render("reports/telco_customer_churn_analysis_rstudio.Rmd")
+   rmarkdown::run("reports/dashboard_shiny_app.Rmd")
+   ```

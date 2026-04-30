@@ -18,7 +18,7 @@ library(plotly)
 # ─────────────────────────────────────────────
 # DATA LOADING & CLEANING
 # ─────────────────────────────────────────────
-raw <- read_csv("data/Guides_Currently_Licensed_in_New_York_State_20250127.csv",
+raw <- read_csv("data/raw/Guides_Currently_Licensed_in_New_York_State_20250127.csv",
                 show_col_types = FALSE)
 
 guides <- raw %>%

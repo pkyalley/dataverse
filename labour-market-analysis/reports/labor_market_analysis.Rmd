@@ -1,0 +1,436 @@
+---
+title: "Labor Market Unemployment Trends Analysis"
+subtitle: "Employment, Unemployment & Labor Force Dynamics — 2007 to 2019"
+author: "Prince Peter Yalley"
+date: "20th May 2025"
+output:
+  html_document:
+    theme: flatly
+    highlight: tango
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+    toc_depth: 3
+    code_folding: hide
+    css: report_style.css
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo      = TRUE,
+  warning   = FALSE,
+  message   = FALSE,
+  fig.width = 10,
+  fig.height= 6,
+  fig.align = "center",
+  out.width = "100%"
+)
+```
+
+```{r libraries}
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(scales)
+library(lubridate)
+library(tidyr)
+library(knitr)
+library(kableExtra)
+library(zoo)
+library(forecast)
+library(tseries)
+```
+
+---
+
+# About This Dataset
+
+This dataset captures **monthly labor market indicators** from **January 2007 through August 2019** — a pivotal 12-year stretch in economic history that includes:
+
+- The **2008 Global Financial Crisis** — the worst economic downturn since the Great Depression
+- The **slow but sustained recovery** from 2010 through 2014
+- The **post-recession expansion** from 2015 to 2019
+
+Each record represents one month and includes the civilian population, labor force size, participation rate, number of employed, number of unemployed, and both the employment and unemployment rates.
+
+**Key questions this analysis answers:**
+
+- How did the Financial Crisis reshape the labor market, and how long did recovery take?
+- Is there a seasonal pattern to unemployment each year?
+- What is the relationship between labor force participation and unemployment?
+- Based on historical trends, where was unemployment headed after 2019?
+
+---
+
+```{r load-data}
+raw <- read_excel("../data/raw/Employment__Unemployment__and_Labor_Force_Data.xlsx")
+
+df <- raw %>%
+  mutate(
+    Date  = as.Date(Date),
+    Year  = as.integer(Year),
+    Month = as.integer(Month),
+    MonthLabel = month.abb[Month],
+    Era = case_when(
+      Year <= 2008 ~ "Pre-Crisis",
+      Year <= 2010 ~ "Crisis",
+      Year <= 2013 ~ "Early Recovery",
+      Year <= 2016 ~ "Late Recovery",
+      TRUE         ~ "Expansion"
+    ),
+    Era = factor(Era, levels = c("Pre-Crisis","Crisis","Early Recovery","Late Recovery","Expansion"))
+  )
+```
+
+# Overview: The Numbers at a Glance
+
+```{r kpis}
+peak_unrate  <- df %>% slice_max(`Unemployment Rate`, n=1)
+low_unrate   <- df %>% slice_min(`Unemployment Rate`, n=1)
+avg_unrate   <- round(mean(df$`Unemployment Rate`), 2)
+total_months <- nrow(df)
+max_unemp    <- max(df$Unemployed)
+min_unemp    <- min(df$Unemployed)
+```
+
+<div class="stat-grid">
+<div class="stat-card">
+  <div class="stat-num">`r total_months`</div>
+  <div class="stat-label">Months of Data</div>
+</div>
+<div class="stat-card">
+  <div class="stat-num">`r avg_unrate`%</div>
+  <div class="stat-label">Avg Unemployment Rate</div>
+</div>
+<div class="stat-card">
+  <div class="stat-num">`r peak_unrate$'Unemployment Rate'`%</div>
+  <div class="stat-label">Peak Rate (Jan 2010)</div>
+</div>
+<div class="stat-card">
+  <div class="stat-num">`r low_unrate$'Unemployment Rate'`%</div>
+  <div class="stat-label">Lowest Rate (Dec 2007)</div>
+</div>
+<div class="stat-card">
+  <div class="stat-num">`r format(max_unemp, big.mark=",")`</div>
+  <div class="stat-label">Peak Unemployed (persons)</div>
+</div>
+</div>
+
+---
+
+# Unemployment Rate Over Time
+
+## The Full 2007–2019 Journey
+
+This chart tells the most important story in the data. Starting from a stable pre-recession rate near 3.5%, unemployment exploded during the 2008–2009 Financial Crisis, peaking at **7.8% in early 2010**. What followed was one of the longest labor market recoveries in modern history — it took nearly **7 years** to return to pre-crisis levels.
+
+```{r unemp-timeline}
+era_bands <- data.frame(
+  xmin  = as.Date(c("2007-01-01","2008-09-01","2010-01-01","2013-01-01","2016-01-01")),
+  xmax  = as.Date(c("2008-08-31","2009-12-31","2012-12-31","2015-12-31","2019-08-01")),
+  label = c("Pre-Crisis","Crisis","Early Recovery","Late Recovery","Expansion"),
+  fill  = c("#e8f5e9","#ffebee","#fff3e0","#e3f2fd","#f3e5f5")
+)
+
+ggplot(df, aes(x = Date, y = `Unemployment Rate`)) +
+  geom_rect(data = era_bands,
+            aes(xmin=xmin, xmax=xmax, ymin=-Inf, ymax=Inf, fill=label),
+            inherit.aes = FALSE, alpha = 0.45) +
+  scale_fill_manual(values = setNames(era_bands$fill, era_bands$label), name = "Era") +
+  geom_line(color = "#c0392b", linewidth = 1.1) +
+  geom_point(data = filter(df, `Unemployment Rate` == max(`Unemployment Rate`)),
+             color = "#c0392b", size = 4, shape = 21, fill = "white", stroke = 2) +
+  geom_point(data = filter(df, `Unemployment Rate` == min(`Unemployment Rate`)),
+             color = "#27ae60", size = 4, shape = 21, fill = "white", stroke = 2) +
+  annotate("text", x = as.Date("2010-06-01"), y = 8.0,
+           label = "Peak: 7.8%\n(Jan 2010)", color = "#c0392b", size = 3.5, fontface="bold") +
+  annotate("text", x = as.Date("2007-06-01"), y = 3.0,
+           label = "Low: 3.3%\n(Dec 2007)", color = "#27ae60", size = 3.5, fontface="bold") +
+  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+  scale_y_continuous(labels = function(x) paste0(x, "%")) +
+  labs(
+    title    = "Monthly Unemployment Rate — 2007 to 2019",
+    subtitle = "The 2008 Financial Crisis drove unemployment from 3.5% to 7.8%; full recovery took ~7 years",
+    x = NULL, y = "Unemployment Rate (%)",
+    caption = "Source: Employment, Unemployment & Labor Force Data"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title    = element_text(face="bold", size=15),
+    plot.subtitle = element_text(color="#555", size=11),
+    legend.position = "bottom",
+    panel.grid.minor = element_blank(),
+    plot.caption = element_text(color="#999", size=9)
+  )
+```
+
+## Yearly Average Unemployment Rate
+
+```{r yearly-avg}
+yearly <- df %>%
+  group_by(Year) %>%
+  summarise(
+    Avg_UnempRate  = round(mean(`Unemployment Rate`), 2),
+    Avg_LFPRate    = round(mean(`Labor Force Participation Rate`), 2),
+    Avg_Employed   = round(mean(Employed)),
+    Avg_Unemployed = round(mean(Unemployed)),
+    .groups = "drop"
+  )
+
+ggplot(yearly, aes(x = factor(Year), y = Avg_UnempRate,
+                   fill = Avg_UnempRate)) +
+  geom_col(width = 0.75) +
+  geom_text(aes(label = paste0(Avg_UnempRate, "%")), vjust = -0.4, size = 3.6) +
+  scale_fill_gradient2(low = "#27ae60", mid = "#f39c12", high = "#c0392b",
+                       midpoint = 5.5, guide = "none") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.12)),
+                     labels = function(x) paste0(x, "%")) +
+  labs(
+    title    = "Average Annual Unemployment Rate",
+    subtitle = "Color intensity reflects severity — green=low, red=high",
+    x = NULL, y = "Avg Unemployment Rate (%)",
+    caption = "Source: Employment, Unemployment & Labor Force Data"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title    = element_text(face="bold", size=15),
+    plot.subtitle = element_text(color="#555", size=11),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor   = element_blank(),
+    plot.caption = element_text(color="#999", size=9)
+  )
+```
+
+---
+
+# Labor Force Participation Rate
+
+## Participation vs. Unemployment — A Diverging Story
+
+One of the most important — and often overlooked — labor market signals is the **Labor Force Participation Rate (LFPR)**. It measures the share of the working-age population that is either employed or actively looking for work.
+
+What makes this dataset fascinating is that **LFPR declined steadily even as unemployment fell**. This means some of the unemployment "improvement" came not from people finding jobs, but from people *giving up looking* — dropping out of the labor force entirely.
+
+```{r lfpr-vs-unemp}
+df_long <- df %>%
+  select(Date, `Unemployment Rate`, `Labor Force Participation Rate`) %>%
+  pivot_longer(-Date, names_to = "Metric", values_to = "Value")
+
+ggplot(df_long, aes(x = Date, y = Value, color = Metric)) +
+  geom_line(linewidth = 1.1) +
+  scale_color_manual(
+    values = c("Unemployment Rate" = "#c0392b",
+               "Labor Force Participation Rate" = "#2980b9"),
+    name = NULL
+  ) +
+  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+  scale_y_continuous(labels = function(x) paste0(x, "%")) +
+  facet_wrap(~Metric, scales = "free_y", ncol = 1) +
+  labs(
+    title    = "Unemployment Rate vs. Labor Force Participation Rate",
+    subtitle = "LFPR declined steadily from 2008–2015, even as unemployment improved — a hidden labor market story",
+    x = NULL, y = NULL,
+    caption = "Source: Employment, Unemployment & Labor Force Data"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title    = element_text(face="bold", size=15),
+    plot.subtitle = element_text(color="#555", size=11),
+    legend.position = "none",
+    strip.text = element_text(face="bold", size=11),
+    panel.grid.minor = element_blank(),
+    plot.caption = element_text(color="#999", size=9)
+  )
+```
+
+---
+
+# Seasonal Patterns
+
+## Does Unemployment Follow a Seasonal Rhythm?
+
+Labor markets have natural seasonal cycles — construction slows in winter, retail spikes during holidays. The chart below shows how unemployment rates behave across months, split by economic era.
+
+```{r seasonal}
+seasonal <- df %>%
+  group_by(Month, Era) %>%
+  summarise(Avg_Rate = mean(`Unemployment Rate`), .groups="drop") %>%
+  mutate(MonthLabel = factor(month.abb[Month], levels = month.abb))
+
+ggplot(seasonal, aes(x = MonthLabel, y = Avg_Rate,
+                     group = Era, color = Era)) +
+  geom_line(linewidth = 1.0) +
+  geom_point(size = 2.5) +
+  scale_color_manual(values = c(
+    "Pre-Crisis"     = "#27ae60",
+    "Crisis"         = "#c0392b",
+    "Early Recovery" = "#e67e22",
+    "Late Recovery"  = "#2980b9",
+    "Expansion"      = "#8e44ad"
+  )) +
+  scale_y_continuous(labels = function(x) paste0(x, "%")) +
+  labs(
+    title    = "Average Monthly Unemployment Rate by Economic Era",
+    subtitle = "Each line represents the average for that month across years in each era",
+    x = NULL, y = "Avg Unemployment Rate (%)",
+    color = "Economic Era",
+    caption = "Source: Employment, Unemployment & Labor Force Data"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title    = element_text(face="bold", size=15),
+    plot.subtitle = element_text(color="#555", size=11),
+    legend.position = "bottom",
+    panel.grid.minor = element_blank(),
+    plot.caption = element_text(color="#999", size=9)
+  )
+```
+
+---
+
+# Employment vs. Unemployed Persons
+
+## The Absolute Numbers Tell a Different Story
+
+While rates are useful, the raw numbers reveal scale. At the crisis peak, over **236,000 people** were unemployed. The number of employed persons, meanwhile, showed strong and consistent growth from 2010 onward.
+
+```{r employed-vs-unemp}
+df %>%
+  select(Date, Employed, Unemployed) %>%
+  pivot_longer(-Date, names_to = "Status", values_to = "Count") %>%
+  ggplot(aes(x = Date, y = Count, fill = Status)) +
+  geom_area(alpha = 0.75, position = "identity") +
+  scale_fill_manual(values = c("Employed" = "#2980b9", "Unemployed" = "#e74c3c"),
+                    name = NULL) +
+  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+  scale_y_continuous(labels = comma) +
+  labs(
+    title    = "Employed vs. Unemployed Persons Over Time",
+    subtitle = "Employed (blue, left scale) shows steady post-recession growth; unemployed (red) peaked in 2010",
+    x = NULL, y = "Number of Persons",
+    caption = "Source: Employment, Unemployment & Labor Force Data"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title    = element_text(face="bold", size=15),
+    plot.subtitle = element_text(color="#555", size=11),
+    legend.position = "bottom",
+    panel.grid.minor = element_blank(),
+    plot.caption = element_text(color="#999", size=9)
+  )
+```
+
+---
+
+# Forecasting: Where Was Unemployment Headed?
+
+## Time Series Forecast Using ARIMA
+
+Using the historical monthly unemployment rate data, we fit an **ARIMA model** — a standard time series forecasting approach — to project where the unemployment rate was trending after August 2019.
+
+This is especially interesting knowing what we know now: the COVID-19 pandemic hit in 2020, causing an unprecedented spike. The forecast below shows the *structural trajectory* the labor market was on before that external shock.
+
+```{r forecast, fig.height=7}
+# Build time series
+unemp_ts <- ts(df$`Unemployment Rate`,
+               start = c(2007, 1),
+               frequency = 12)
+
+# Fit ARIMA — auto-select best model
+fit <- auto.arima(unemp_ts, seasonal = TRUE, stepwise = FALSE, approximation = FALSE)
+
+# Forecast 24 months ahead (to end of 2021)
+fc <- forecast(fit, h = 24, level = c(80, 95))
+
+autoplot(fc) +
+  geom_hline(yintercept = mean(df$`Unemployment Rate`[df$Year <= 2008]),
+             linetype = "dashed", color = "#27ae60", linewidth = 0.8) +
+  annotate("text", x = 2008.5, y = mean(df$`Unemployment Rate`[df$Year <= 2008]) + 0.12,
+           label = "Pre-crisis avg: ~3.5%", color = "#27ae60", size = 3.5) +
+  scale_y_continuous(labels = function(x) paste0(x, "%")) +
+  labs(
+    title    = "ARIMA Forecast: Unemployment Rate Through 2021",
+    subtitle = paste0("Model: ", as.character(fit),
+                      " | Forecast shows continued gradual decline absent external shocks"),
+    x = NULL, y = "Unemployment Rate (%)",
+    caption = "Source: Employment, Unemployment & Labor Force Data | Forecast via auto.arima()"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title    = element_text(face="bold", size=15),
+    plot.subtitle = element_text(color="#555", size=11),
+    panel.grid.minor = element_blank(),
+    plot.caption = element_text(color="#999", size=9)
+  )
+```
+
+```{r arima-summary}
+cat("ARIMA Model Summary\n")
+cat("===================\n")
+summary(fit)
+```
+
+## What the Model Says
+
+```{r forecast-table}
+fc_df <- data.frame(
+  Month = seq(as.Date("2019-09-01"), by = "month", length.out = 24),
+  Forecast = round(as.numeric(fc$mean), 2),
+  Lower_80  = round(as.numeric(fc$lower[,1]), 2),
+  Upper_80  = round(as.numeric(fc$upper[,1]), 2)
+)
+
+fc_df %>%
+  head(12) %>%
+  kable(caption = "12-Month Unemployment Rate Forecast (Sep 2019 – Aug 2020)",
+        col.names = c("Month", "Point Forecast (%)", "Lower 80% CI", "Upper 80% CI")) %>%
+  kable_styling(bootstrap_options = c("striped","hover","condensed"),
+                full_width = FALSE) %>%
+  row_spec(0, bold=TRUE, background="#2980b9", color="white")
+```
+
+---
+
+# Year-over-Year Summary Table
+
+```{r yoy-table}
+yearly %>%
+  rename(
+    `Avg Unemployment (%)` = Avg_UnempRate,
+    `Avg LFP Rate (%)`     = Avg_LFPRate,
+    `Avg Employed`         = Avg_Employed,
+    `Avg Unemployed`       = Avg_Unemployed
+  ) %>%
+  mutate(
+    `Avg Employed`   = format(`Avg Employed`,   big.mark=","),
+    `Avg Unemployed` = format(`Avg Unemployed`, big.mark=",")
+  ) %>%
+  kable(caption = "Annual Labor Market Summary — 2007 to 2019") %>%
+  kable_styling(bootstrap_options = c("striped","hover","condensed"),
+                full_width = FALSE) %>%
+  row_spec(0, bold=TRUE, background="#2980b9", color="white") %>%
+  row_spec(which(yearly$Year %in% c(2009,2010)), background="#fff3cd")
+```
+
+---
+
+# Key Takeaways
+
+<div class="takeaway-box">
+
+1. **The 2008 Financial Crisis doubled unemployment in 2 years.** The rate surged from 3.3% in late 2007 to 7.8% by January 2010 — a nearly 150% increase in unemployment.
+
+2. **Recovery was real but slow.** It took until 2015–2016 for unemployment to fall back to pre-crisis levels, representing one of the slowest labor market recoveries in post-war history.
+
+3. **Labor Force Participation tells a darker story.** The LFPR dropped from ~69% in 2008 to under 67% by 2015. This means part of the unemployment improvement came from people leaving the workforce, not from job creation alone.
+
+4. **Employment grew consistently from 2010 onward.** Despite the slow rate recovery, absolute employment numbers rose every year after 2009 — from ~2.8M to ~3.1M employed persons.
+
+5. **The ARIMA forecast projected continued decline.** Based purely on historical trend, unemployment was on track to approach or breach the 3.3% pre-crisis low by 2020–2021 — before COVID-19 changed everything.
+
+</div>
+
+---
+
+*Data sourced from Employment, Unemployment & Labor Force Data. Analysis conducted in R using `readxl`, `dplyr`, `ggplot2`, `forecast`, and `kableExtra`.*

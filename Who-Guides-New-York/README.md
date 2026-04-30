@@ -26,16 +26,17 @@ The goal is to answer meaningful questions about the state of outdoor guiding in
 ## 📁 Project Structure
 
 ```
-ny-guides-project/
-│
-├── data/
-│   └── Guides_Currently_Licensed_in_New_York_State_20250127.csv
-│
-├── ny_guides_report.Rmd     # Narrative HTML report (R Markdown)
-├── report_style.css         # Custom CSS for the HTML report
+Who-Guides-New-York/
 │
 ├── app.R                    # Shiny dashboard application
-│
+├── data/
+│   └── raw/
+│       └── Guides_Currently_Licensed_in_New_York_State_20250127.csv
+├── reports/
+│   ├── Who-Guides-New-York.Rmd    # Narrative HTML report (R Markdown)
+│   ├── Who-Guides-New-York.html   # Rendered HTML report snapshot
+│   └── report_style.css           # Custom CSS for the HTML report
+├── requirements.R
 └── README.md
 ```
 
@@ -94,26 +95,10 @@ The dataset covers 12 distinct activity certifications:
 
 ### Prerequisites
 
-Install R (≥ 4.2) and RStudio. Then install the required packages:
+Install R (≥ 4.2) and RStudio, then install the required packages:
 
 ```r
-install.packages(c(
-  "shiny",
-  "shinydashboard",
-  "readr",
-  "dplyr",
-  "ggplot2",
-  "plotly",
-  "lubridate",
-  "stringr",
-  "scales",
-  "forcats",
-  "DT",
-  "tidyr",
-  "knitr",
-  "kableExtra",
-  "rmarkdown"
-))
+source("requirements.R")
 ```
 
 ### 1. Clone the Repository
@@ -125,13 +110,13 @@ cd ny-guides-project
 
 ### 2. Run the HTML Report
 
-Open `ny_guides_report.Rmd` in RStudio and click **Knit**, or run from the console:
+Open `reports/Who-Guides-New-York.Rmd` in RStudio and click **Knit**, or run from the console:
 
 ```r
-rmarkdown::render("ny_guides_report.Rmd", output_file = "NY_Guides_Report.html")
+rmarkdown::render("reports/Who-Guides-New-York.Rmd")
 ```
 
-This will generate `NY_Guides_Report.html` — open it in any browser.
+This will generate `reports/Who-Guides-New-York.html` — open it in any browser.
 
 ### 3. Launch the Shiny Dashboard
 
@@ -143,7 +128,7 @@ shiny::runApp(".")
 
 The dashboard will open at `http://127.0.0.1:XXXX` in your browser.
 
-> **Note:** Both the report and the app expect the CSV to be in the `data/` subdirectory relative to the working directory.
+> **Note:** Both the report and the app expect the CSV to be in `data/raw/` relative to the project root.
 
 ---
 

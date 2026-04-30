@@ -6,4 +6,4 @@ Please follow these steps:
 Open a terminal in Visual Studio Code.
 Run the following command:
 
-streamlit run dashboard.py
+streamlit run app.py
