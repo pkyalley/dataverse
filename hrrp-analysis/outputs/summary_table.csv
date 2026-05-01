@@ -1,0 +1,13 @@
+Metric,Value
+Total hospital-condition records,"11,720"
+Unique hospitals,"2,833"
+Overall % with ERR > 1.0,48.1%
+ANOVA F-stat,0.25
+ANOVA p-value,9.3802e-01
+Logistic Regression Accuracy,99.79%
+ROC AUC,1.000
+Condition with HIGHEST % excess hospitals,Heart Surgery (CABG) (49.9%)
+Condition with LOWEST % excess hospitals,Pneumonia (PN) (46.8%)
+State with HIGHEST mean ERR,MA (1.0344)
+State with LOWEST mean ERR,ID (0.9432)
+All figures saved to,outputs\
