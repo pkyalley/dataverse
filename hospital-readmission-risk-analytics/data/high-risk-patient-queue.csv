@@ -1,0 +1,44 @@
+Patient ID,Age,Gender,Diagnosis,LOS,Dual Eligible,Follow-Up Scheduled,Discharge Destination,Comorbidity Score,SVI Score,Risk Score,Risk Tier,Readmitted
+PT-10465,71,Male,Heart Failure,1,1,0,Home,6,0.657,89.6,High,1
+PT-10491,75,Female,Heart Failure,3,1,0,Home,6,0.878,87.5,High,0
+PT-10397,81,Male,COPD,6,1,1,Home,9,0.952,81.4,High,1
+PT-10403,77,Male,Hip/Knee Replacement,5,1,0,SNF,6,0.641,80.3,High,1
+PT-10029,92,Male,Pneumonia,12,1,0,SNF,7,0.611,80.3,High,1
+PT-10408,62,Female,Heart Failure,7,0,0,Home,7,0.645,76.8,High,1
+PT-10414,68,Male,Heart Failure,9,1,0,Home,5,0.757,76.1,High,1
+PT-10096,69,Male,Pneumonia,1,1,0,Home,3,0.238,72.2,High,1
+PT-10175,83,Male,COPD,5,0,0,Home,6,0.091,71.5,High,1
+PT-10062,67,Female,COPD,1,1,1,Home with HHA,9,0.993,70.4,High,1
+PT-10243,72,Male,Acute MI,2,1,0,Rehab Facility,8,0.123,70.0,High,1
+PT-10378,95,Male,Heart Failure,1,1,0,Hospice,5,0.812,69.6,High,0
+PT-10406,76,Male,COPD,1,1,0,Home with HHA,1,0.591,69.6,High,1
+PT-10451,88,Female,Heart Failure,7,1,1,Hospice,6,0.584,68.8,High,0
+PT-10461,69,Male,Pneumonia,5,1,0,Home,3,0.481,67.7,High,1
+PT-10068,69,Female,Heart Failure,1,0,0,Rehab Facility,7,0.727,67.7,High,1
+PT-10087,61,Male,COPD,4,1,0,Home,4,0.173,67.7,High,1
+PT-10430,87,Female,COPD,3,0,0,SNF,6,0.515,65.9,High,0
+PT-10382,64,Male,Heart Failure,3,1,1,SNF,8,0.791,65.9,High,1
+PT-10188,66,Male,Acute MI,1,0,0,Home,1,0.693,65.3,High,0
+PT-10022,95,Female,COPD,2,1,0,Hospice,1,0.875,64.9,High,0
+PT-10251,76,Male,Heart Failure,1,1,1,SNF,7,0.13,64.4,High,0
+PT-10161,89,Male,Hip/Knee Replacement,1,1,1,Rehab Facility,8,0.438,64.4,High,1
+PT-10284,65,Female,Heart Failure,4,0,1,Home,6,0.574,64.4,High,1
+PT-10124,69,Female,Hip/Knee Replacement,9,1,1,Home,5,0.978,63.5,High,1
+PT-10262,63,Female,COPD,3,1,1,Home,2,0.693,63.5,High,1
+PT-10234,77,Male,Heart Failure,9,0,0,Home,0,0.89,63.5,High,1
+PT-10422,63,Female,COPD,7,1,1,Home,3,0.679,63.5,High,0
+PT-10390,65,Female,Heart Failure,3,1,1,Home,0,0.574,63.5,High,0
+PT-10333,65,Female,COPD,2,1,1,Home,3,0.613,63.5,High,1
+PT-10325,61,Female,Heart Failure,6,0,0,Rehab Facility,6,0.879,62.8,High,0
+PT-10468,67,Female,Heart Failure,7,0,0,SNF,6,0.515,62.8,High,0
+PT-10149,65,Female,Pneumonia,5,0,0,Rehab Facility,7,0.821,62.8,High,1
+PT-10231,56,Female,COPD,3,0,0,Home with HHA,6,0.662,62.6,High,1
+PT-10132,78,Male,COPD,1,1,1,Home,2,0.308,62.0,High,1
+PT-10371,66,Male,Heart Failure,8,1,0,SNF,5,0.638,61.8,High,1
+PT-10398,67,Female,COPD,2,1,0,SNF,3,0.579,61.8,High,0
+PT-10159,45,Female,Acute MI,2,1,0,SNF,1,0.645,61.8,High,1
+PT-10354,69,Male,Heart Failure,3,1,0,Home with HHA,0,0.792,61.7,High,1
+PT-10079,58,Male,Pneumonia,1,1,1,SNF,6,0.156,61.2,High,0
+PT-10018,41,Male,Pneumonia,7,0,0,Home,5,0.506,60.3,High,1
+PT-10046,74,Female,Pneumonia,5,0,0,Home,4,0.791,60.3,High,1
+PT-10264,72,Female,Acute MI,5,0,0,Home,3,0.507,60.3,High,1

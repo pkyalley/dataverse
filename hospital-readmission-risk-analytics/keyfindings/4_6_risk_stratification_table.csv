@@ -1,0 +1,4 @@
+Model_Tier,N_Patients,Readmissions,Readmission_Rate,Share_of_All_Readmits
+Low,342,58,17.0,41.7
+Moderate,115,51,44.3,36.7
+High,43,30,69.8,21.6
