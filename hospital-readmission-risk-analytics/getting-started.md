@@ -31,7 +31,7 @@ jupyter notebook hospital-readmission-analysis.ipynb
 ### Step 3: Launch Streamlit Dashboard
 After the notebook completes, run:
 ```bash
-streamlit run dashboard_app.py
+streamlit run dashboard-app.py
 ```
 
 The dashboard will open at: `http://localhost:8501/`

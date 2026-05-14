@@ -33,8 +33,8 @@ ny-licensed-guides-analysis/
 │   └── raw/
 │       └── Guides_Currently_Licensed_in_New_York_State_20250127.csv
 ├── reports/
-│   ├── who_guides_new_york.Rmd    # Narrative HTML report (R Markdown)
-│   ├── who_guides_new_york.html   # Rendered HTML report snapshot
+│   ├── who-guides-new-york.Rmd    # Narrative HTML report (R Markdown)
+│   ├── who-guides-new-york.html   # Rendered HTML report snapshot
 │   └── report_style.css           # Custom CSS for the HTML report
 ├── requirements.R
 └── README.md
@@ -110,13 +110,13 @@ cd dataverse/ny-licensed-guides-analysis
 
 ### 2. Run the HTML Report
 
-Open `reports/who_guides_new_york.Rmd` in RStudio and click **Knit**, or run from the console:
+Open `reports/who-guides-new-york.Rmd` in RStudio and click **Knit**, or run from the console:
 
 ```r
-rmarkdown::render("reports/who_guides_new_york.Rmd")
+rmarkdown::render("reports/who-guides-new-york.Rmd")
 ```
 
-This will generate `reports/who_guides_new_york.html` — open it in any browser.
+This will generate `reports/who-guides-new-york.html` — open it in any browser.
 
 ### 3. Launch the Shiny Dashboard
 
