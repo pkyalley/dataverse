@@ -35,7 +35,7 @@ Hospital Readmission Risk Analytics/
 │   ├── high-risk-patient-queue.csv               # Final queue export
 │   └── model-artifacts.pkl                       # Trained model components
 ├── hospital-readmission-analysis.ipynb           # Main Jupyter notebook
-├── dashboard-app.py                              # Streamlit dashboard
+├── dashboard_app.py                              # Streamlit dashboard
 ├── README.md                                     # This file
 └── hospital-readmission-analysis.py              # Original Python script (archived)
 ```
@@ -73,7 +73,7 @@ jupyter notebook hospital-readmission-analysis.ipynb
 ### 3. **Launch the Streamlit Dashboard**
 
 ```bash
-streamlit run dashboard-app.py
+streamlit run dashboard_app.py
 ```
 
 The dashboard will open in your browser at `http://localhost:8501/`
@@ -226,7 +226,7 @@ Add cells to the notebook following the pattern of existing chart sections.
 
 ### Modify Dashboard Appearance:
 
-Edit colors in `dashboard-app.py`:
+Edit colors in `dashboard_app.py`:
 
 ```python
 BLUE   = "#1a5c9e"
@@ -265,7 +265,7 @@ RED    = "#c0392b"
 For questions about the analysis:
 
 1. Check the Jupyter notebook for detailed comments on each section
-2. Review the docstrings in `dashboard-app.py`
+2. Review the docstrings in `dashboard_app.py`
 3. Examine the generated charts in the `output/` folder for insights
 
 ---

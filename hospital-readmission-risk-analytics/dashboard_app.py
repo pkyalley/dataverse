@@ -15,7 +15,7 @@ Design Specification (Section 5.2):
   of all patients with risk score ≥ 60, with filterable columns for condition and 
   follow-up status
 
-Run with: streamlit run dashboard-app.py
+Run with: streamlit run dashboard_app.py
 """
 
 import streamlit as st

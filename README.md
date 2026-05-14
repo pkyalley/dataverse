@@ -14,6 +14,9 @@
 | [🌲 NY State Park Attendance Analysis](./ny-state-park-attendance-analysis/) | 20-year visitor trend analysis for NY State Parks with ARIMA forecasting and an interactive Shiny dashboard | R, Shiny, ggplot2, forecast |
 | [🏔️ NY Licensed Guides Analysis](./ny-licensed-guides-analysis/) | Geographic and activity analysis of 2,516 licensed outdoor guides in New York State | R, Shiny, plotly |
 | [📊 NY Labor Market Analysis](./ny-labor-market-analysis/) | Time series analysis of NY employment and unemployment from the 2008 Financial Crisis through 2019, with ARIMA forecasting | R, Shiny, forecast |
+| [🏥 Hospital Readmission Risk Analytics](./hospital-readmission-risk-analytics/) | Predictive modeling pipeline for patient readmission risk with risk-tiering and an interactive Streamlit dashboard | Python, Scikit-learn, Streamlit |
+| [🧾 HRRP Analysis](./hrrp-analysis/) | CMS HRRP FY 2026 exploratory analysis of hospital excess readmission patterns with a Streamlit dashboard | Python, Pandas, Streamlit |
+| [💰 NHE Analysis](./nhe-analysis/) | National Health Expenditure trend analysis with payer mix, per-capita growth, and forecasting visuals | Python, Pandas, Streamlit |
 
 ---
 
