@@ -1,6 +1,6 @@
 # 🌌 DataVerse
 
-> A collection of data analysis, data science, and machine learning projects spanning public policy, finance, healthcare, and business analytics.
+> A collection of business, health, and data analysis, data science, and machine learning projects spanning public policy, finance, healthcare, and business analytics.
 
 ---
 
