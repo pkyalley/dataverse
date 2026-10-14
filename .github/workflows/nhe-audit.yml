@@ -1,4 +1,4 @@
-name: NHE audit workbook inventory
+name: NHE workbook reproduction
 on:
   push:
     paths:
@@ -8,19 +8,22 @@ on:
 permissions:
   contents: read
 jobs:
-  inspect:
+  reproduce:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: python -m pip install openpyxl
+      - run: python -m pip install openpyxl numpy pandas matplotlib scipy
       - run: python nhe-analysis/audit-2026/inspect_workbooks.py
       - run: python nhe-analysis/audit-2026/inspect_rows.py
       - run: python nhe-analysis/audit-2026/reproduce.py
+      - run: python nhe-analysis/audit-2026/reproduce_workbooks.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: nhe-audit-inventory
-          path: nhe-analysis/audit-2026/results/
+          name: nhe-workbook-reproduction
+          path: |
+            nhe-analysis/audit-2026/results/
+            nhe-analysis/audit-2026/figures/
