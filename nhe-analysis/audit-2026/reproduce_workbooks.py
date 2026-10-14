@@ -174,6 +174,46 @@ def main():
     ax.set(xlabel="Year",ylabel="NHE (trillions USD)",title="Illustrative NHE trajectory; NOT official CMS forecast")
     ax.legend()
     chart(fig,"corrected_fig10_scenario.png")
+
+    # Summary-only figures 1, 2, 6 and table 1, independently from archived CSV.
+    with (DATA/"NHE24_Summary.csv").open(newline="",encoding="utf-8-sig") as f:
+        sr=list(csv.reader(f))
+    yr_row=next(row for row in sr if len(row)>4 and row[1:4]==["1960","1961","1962"])
+    all_years=[int(v) for v in yr_row[1:] if v.isdigit()]
+    def summary(keyword):
+        candidates=[r for r in sr if r and keyword.casefold() in r[0].casefold()]
+        assert candidates,keyword
+        return pd.Series({y:float(candidates[0][i+1].replace(",","")) for i,y in enumerate(all_years)},dtype=float)
+    nhe_full=summary("National Health Expenditures (Amount in Billions)")
+    admin_full=summary("Government Administration and Non-Medical Insurance Expenditures")
+    percap=summary("National Health Expenditures (Per Capita Amount)")
+    gdp_full=summary("Gross Domestic Product2  (Amount")
+    fig,ax=plt.subplots(figsize=(11,6))
+    ax.plot(nhe_full.index,nhe_full.values/1000,label="NHE, trillions USD")
+    ax.set(xlabel="Year",ylabel="NHE (trillions USD)",title="NHE spending and GDP share, 1960–2024")
+    ax2=ax.twinx()
+    ax2.plot(nhe_full.index,100*nhe_full.values/gdp_full.values,color="darkred",ls="--",label="NHE as % GDP")
+    ax2.set_ylabel("NHE / GDP (%)")
+    chart(fig,"corrected_fig1_nhe_gdp.png")
+    fig,ax=plt.subplots(figsize=(11,6))
+    ax.plot(admin_full.index,admin_full.values,label="Gov admin + non-medical insurance, $B")
+    ax.set(xlabel="Year",ylabel="Nominal billions USD",title="CMS administrative category, 1960–2024")
+    ax2=ax.twinx()
+    ax2.plot(admin_full.index,100*admin_full.values/nhe_full.values,color="darkred",ls="--")
+    ax2.set_ylabel("Share of NHE (%)")
+    chart(fig,"corrected_fig2_admin_trend.png")
+    fig,ax=plt.subplots(figsize=(11,6))
+    ax.plot(percap.index,percap.values)
+    ax.set(xlabel="Year",ylabel="NHE per capita (nominal USD)",title="NHE per capita, 1960–2024")
+    chart(fig,"corrected_fig6_per_capita.png")
+    years_table=[1970,1980,1990,2000,2010,2015,2020,2022,2023,2024]
+    with (OUT/"table1_summary_corrected.csv").open("w",newline="") as f:
+        w=csv.writer(f)
+        w.writerow(["year","nhe_billion","nhe_pct_gdp","admin_billion","admin_pct_nhe","nhe_per_capita"])
+        for yr in years_table:
+            w.writerow([yr,nhe_full[yr],100*nhe_full[yr]/gdp_full[yr],admin_full[yr],
+                        100*admin_full[yr]/nhe_full[yr],percap[yr]])
+    print("Wrote Figures 1, 2, 6 and Table 1 CSV from archived summary data.")
     print(json.dumps(stats,indent=2))
     print("Wrote 7 figures and 3 workbook-derived data files.")
 
