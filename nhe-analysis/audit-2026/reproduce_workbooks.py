@@ -162,7 +162,7 @@ def main():
     chart(fig,"corrected_fig8_scatter.png")
     # Corrected Figure 9: complete NHE denominator.
     fig,ax=plt.subplots(figsize=(9,7))
-    vals=[stats["payer_2024"][k]["billions"] for k in labels]
+    vals=[stats["payer_2024"][k]["billions"] for k in list(payers)+["Other NHE (remainder)"]]
     ax.pie(vals,labels=labels,autopct="%1.1f%%",startangle=90)
     ax.set_title("2024 shares of total NHE (including all remaining categories)")
     chart(fig,"corrected_fig9_payer_donut.png")
