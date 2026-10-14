@@ -1,22 +1,26 @@
 {
-  "source": "nhe-analysis/data/NHE24_Summary.csv (archived CMS NHE24)",
-  "unit": "billions of nominal USD",
+  "source": "Archived NHE24_Summary.csv; nominal USD billions",
   "nhe_2024_billion": 5278.6,
   "admin_2024_billion": 372.1,
   "admin_1990_billion": 38.3,
   "admin_share_2024_pct": 7.049217595574584,
-  "admin_growth_1990_2024_pct": 871.5404699738905,
-  "admin_share_selected_years_pct": {
+  "admin_nominal_growth_1990_2024_pct": 871.5404699738905,
+  "admin_share_by_year_pct": {
     "1990": 5.329066369834423,
     "2000": 5.874597128625842,
     "2010": 6.995789392359099,
     "2020": 8.448493209333302,
     "2024": 7.049217595574584
   },
-  "pearson_levels_1960_2024": 0.9949841642430012,
-  "pearson_levels_1980_2024": 0.9946733394195612,
-  "pearson_log_growth_1961_2024": 0.439827031024175,
+  "pearson_nominal_1960_2024": 0.9949841642430007,
+  "pearson_nominal_1980_2024": 0.9946733394195612,
+  "pearson_annual_log_growth": 0.439827031024175,
   "scenario_2030_billion_5_8pct": 7403.4263377192,
   "scenario_2033_billion_5_8pct": 8767.78239640221,
-  "interpretation": "Historical CMS category is not a measure of waste. The projection is an illustrative assumption, not official CMS forecasts or a confidence interval."
+  "limitations": [
+    "Nominal series; no inflation adjustment",
+    "Correlation is not causal evidence",
+    "CMS category is not a measure of waste",
+    "5.8% growth is illustrative, not official CMS forecast"
+  ]
 }
