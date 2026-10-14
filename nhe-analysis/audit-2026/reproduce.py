@@ -21,7 +21,7 @@ def main():
     assert years==list(range(1960,2025)),"Unexpected source years"
     def get(label):
         hits=[r for r in rows if r and r[0].strip()==label]
-        assert len(hits)==1,(label,len(hits))
+        assert len(hits)>=1,(label,len(hits))\n        # Source repeats the same label across summary sections; the first is the amount row.
         values=hits[0][1:len(years)+1]
         assert len(values)==len(years)
         return {y:float(v.replace(",","")) for y,v in zip(years,values)}

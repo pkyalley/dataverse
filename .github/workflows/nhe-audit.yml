@@ -17,8 +17,10 @@ jobs:
           python-version: '3.11'
       - run: python -m pip install openpyxl
       - run: python nhe-analysis/audit-2026/inspect_workbooks.py
+      - run: python nhe-analysis/audit-2026/inspect_rows.py
       - run: python nhe-analysis/audit-2026/reproduce.py
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: nhe-audit-inventory
           path: nhe-analysis/audit-2026/results/
