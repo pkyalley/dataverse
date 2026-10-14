@@ -52,7 +52,7 @@
   },
   "correlation_1980_2024": {
     "n_observed_years": 27,
-    "pearson_r_available_years": 0.9906769677340665
+    "pearson_r_available_years": 0.9906769677340664
   },
   "source_years": [
     1960,
